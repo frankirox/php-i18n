@@ -25,9 +25,18 @@ class I18n
 
     public function __construct ( $directory )
     {
-        $this->directory    = $directory;
-        $this->finder       = new Finder( $this->directory );
-        $this->cleaner      = new Cleaner();
+        $this->directory = [$directory];
+    }
+
+    public function addDirectory($dir)
+    {
+        $this->directory[] = $dir;
+    }
+
+    public function init()
+    {
+        $this->finder  = new Finder( $this->directory );
+        $this->cleaner = new Cleaner();
     }
 
     /**

@@ -29,7 +29,7 @@ class LocaleCache
     public function __construct ( $langDirectory )
     {
         $this->cache            = [];
-        $this->langDirectory    = $langDirectory;
+        $this->langDirectory    = ( ! is_array($langDirectory) ? [$langDirectory] : $langDirectory );
         $this->parser           = new Parser();
     }
 
@@ -55,15 +55,19 @@ class LocaleCache
      */
     private function build ( $locale )
     {
-        $cache      = [];
-        $directory  = new Directory( $this->langDirectory . '/' . $locale );
-        $files      = $directory->getFiles();
+        $cache = [];
 
-        foreach ( $files as $file )
+        foreach ( $this->langDirectory as $dir )
         {
-            $data   = $this->parser->parse( $file->readFile() );
-            $data   = [ $this->getInitialKey( $file ) => $data ];
-            $cache  = array_merge( $cache, $data );
+            $directory  = new Directory( $dir . '/' . $locale );
+            $files      = $directory->getFiles();
+
+            foreach ( $files as $file )
+            {
+                $data   = $this->parser->parse( $file->readFile() );
+                $data   = [ $this->getInitialKey( $file ) => $data ];
+                $cache  = array_merge( $cache, $data );
+            }
         }
 
         $this->cache[$locale] = $cache;
